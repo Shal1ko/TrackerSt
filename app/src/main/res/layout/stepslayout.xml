@@ -7,14 +7,11 @@
     <TextView
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:text=""
-        android:id="@+id/displayer"/>
+        android:id="@+id/steps"/>
 
-    <Button
+    <TextView
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:id="@+id/toSteps"
-        android:text="Go to step analytics"/>
-
+        android:id="@+id/date"/>
 
 </LinearLayout>

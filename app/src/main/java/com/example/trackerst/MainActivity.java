@@ -3,13 +3,49 @@ package com.example.trackerst;
 import android.os.Bundle;
 
 import androidx.activity.EdgeToEdge;
+import androidx.annotation.Nullable;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.core.graphics.Insets;
 import androidx.core.view.ViewCompat;
 import androidx.core.view.WindowInsetsCompat;
+import androidx.fragment.app.Fragment;
 import androidx.fragment.app.FragmentManager;
 
 public class MainActivity extends AppCompatActivity {
+
+    public void nextFragment(String backStackName, String fragmentName) {
+        nextFragment(backStackName, fragmentName, null);
+    }
+
+    public void nextFragment(String backStackName, String fragmentName, @Nullable Bundle bundle) {
+        FragmentManager fm = getSupportFragmentManager();
+        Fragment fragment = null;
+
+        switch (fragmentName) {
+            case "startFragment":
+                fragment = new startFragment();
+                break;
+            case "stepsFragment":
+                fragment = new stepsFragment();
+                break;
+            default:
+                break;
+        }
+
+        if (fragment != null && bundle != null) {
+            fragment.setArguments(bundle);
+        }
+
+        fm.beginTransaction().addToBackStack(backStackName)
+                .replace(R.id.fragment_container, fragment).commit();
+    }
+
+    public void previousFragment() {
+        FragmentManager fm = getSupportFragmentManager();
+        fm.popBackStack();
+    }
+
+
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -25,6 +61,7 @@ public class MainActivity extends AppCompatActivity {
         if (savedInstanceState == null) {
             FragmentManager fm = getSupportFragmentManager();
             fm.beginTransaction()
+                    .addToBackStack("Start")
                     .add(R.id.fragment_container, new startFragment())
                     .commit();
         }

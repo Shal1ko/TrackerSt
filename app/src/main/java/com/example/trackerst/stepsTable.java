@@ -12,7 +12,7 @@ import java.util.ArrayList;
 
 public class stepsTable extends SQLiteOpenHelper {
 
-    public static final String TABLE_NAME = "steps", COLUMN_1 = "ID", COLUMN_2 = "STEPS", COLUMN_3 = "DATE";
+    public static final String TABLE_NAME = "steps", COLUMN_1_ID = "ID", COLUMN_2_STEPS = "STEPS", COLUMN_3_DATE = "DATE";
 
     public stepsTable(@Nullable Context context, @Nullable String name, @Nullable SQLiteDatabase.CursorFactory factory, int version) {
         super(context, name, factory, version);
@@ -20,13 +20,13 @@ public class stepsTable extends SQLiteOpenHelper {
 
     @Override
     public void onCreate(SQLiteDatabase db) {
-        db.execSQL("CREATE TABLE IF NOT EXISTS " + TABLE_NAME + " (" + COLUMN_1 + " INTEGER PRIMARY KEY AUTOINCREMENT, " + COLUMN_2 + " INTEGER, " + COLUMN_3 + " DATE)");
+        db.execSQL("CREATE TABLE IF NOT EXISTS " + TABLE_NAME + " (" + COLUMN_1_ID + " INTEGER PRIMARY KEY AUTOINCREMENT, " + COLUMN_2_STEPS + " INTEGER, " + COLUMN_3_DATE + " DATE)");
     }
 
     @Override
     public void onUpgrade(SQLiteDatabase db, int oldVersion, int newVersion) {
         db.execSQL("DROP TABLE IF EXISTS " + TABLE_NAME);
-        db.execSQL("CREATE TABLE IF NOT EXISTS " + TABLE_NAME + " (" + COLUMN_1 + " INTEGER PRIMARY KEY AUTOINCREMENT, " + COLUMN_2 + " INTEGER, " + COLUMN_3 + " DATE)");
+        onCreate(db);
     }
 
     public void insertData(ContentValues values) {
@@ -37,7 +37,7 @@ public class stepsTable extends SQLiteOpenHelper {
 
     public void deleteData(int id) {
         SQLiteDatabase db = getWritableDatabase();
-        db.delete(TABLE_NAME, COLUMN_1 + " = ?", new String[]{String.valueOf(id)});
+        db.delete(TABLE_NAME, COLUMN_1_ID + " = ?", new String[]{String.valueOf(id)});
         db.close();
     }
 

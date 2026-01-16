@@ -1,20 +1,56 @@
 <?xml version="1.0" encoding="utf-8"?>
-<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+<androidx.constraintlayout.widget.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:id="@+id/linearLayout"
     android:layout_width="match_parent"
-    android:layout_height="match_parent"
-    android:orientation="vertical">
+    android:layout_height="match_parent">
+
+    <ImageView
+        android:id="@+id/ctepCircleView"
+        android:layout_width="match_parent"
+        android:layout_height="250dp"
+        android:src="@drawable/step_circle"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintHorizontal_bias="0.0"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toTopOf="parent" />
 
     <TextView
-        android:layout_width="match_parent"
+        android:id="@+id/displayer"
+        android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:text=""
-        android:id="@+id/displayer"/>
+        android:layout_marginTop="96dp"
+        android:gravity="center"
+        android:text="0"
+        android:textSize="20sp"
+        app:layout_constraintBottom_toBottomOf="@id/ctepCircleView"
+        app:layout_constraintEnd_toEndOf="@id/ctepCircleView"
+        app:layout_constraintStart_toStartOf="@id/ctepCircleView"
+        app:layout_constraintTop_toTopOf="@id/ctepCircleView"
+        app:layout_constraintVertical_bias="0.0" />
 
     <Button
-        android:layout_width="match_parent"
+        android:id="@+id/startCounting"
+        android:layout_width="0dp"
         android:layout_height="wrap_content"
+        android:layout_marginTop="268dp"
+        android:text="Start Counting"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintHorizontal_bias="1.0"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toTopOf="parent" />
+
+    <Button
         android:id="@+id/toSteps"
-        android:text="Go to step analytics"/>
+        android:layout_width="0dp"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="4dp"
+        android:text="Go to step analytics"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintHorizontal_bias="0.0"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@+id/startCounting" />
 
 
-</LinearLayout>
+</androidx.constraintlayout.widget.ConstraintLayout>

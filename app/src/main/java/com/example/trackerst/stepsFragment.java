@@ -55,8 +55,8 @@ public class stepsFragment extends Fragment {
 
 
             ContentValues values = new ContentValues();
-            values.put(stepsTable.COLUMN_2, stepCount);
-            values.put(stepsTable.COLUMN_3, date);
+            values.put(stepsTable.COLUMN_2_STEPS, stepCount);
+            values.put(stepsTable.COLUMN_3_DATE, date);
             StepsTable.insertData(values);
         }
 
@@ -75,7 +75,7 @@ public class stepsFragment extends Fragment {
                                 adapter.notifyDataSetChanged();
                             }
                         })
-                        .setNegativeButton("No", null);
+                        .setNegativeButton("No", null).show();
 
                 return false;
             }

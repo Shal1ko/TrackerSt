@@ -18,11 +18,11 @@ import androidx.fragment.app.Fragment;
 
 public class startFragment extends Fragment implements SensorEventListener {
     TextView displayer;
-    Button returnToStart;
+    Button toSteps, startCounting;
     SensorManager sm;
     Sensor Accelometer;
 
-    int stepCount = 0;
+    static int stepCount = 0;
     long lastStepTime = 0;
     static final int STEP_DELAY_MS = 500;
     static final float STEP_THRESHOLD = 9.8f * 1.5f;
@@ -42,7 +42,8 @@ public class startFragment extends Fragment implements SensorEventListener {
     @Override
     public void onViewCreated(@NonNull View view, @Nullable Bundle savedInstanceState) {
         displayer = view.findViewById(R.id.displayer);
-        returnToStart = view.findViewById(R.id.toSteps);
+        toSteps = view.findViewById(R.id.toSteps);
+        startCounting = view.findViewById(R.id.startCounting);
 
         accelCurrent = SensorManager.GRAVITY_EARTH;
         accelLast = SensorManager.GRAVITY_EARTH;
@@ -50,17 +51,49 @@ public class startFragment extends Fragment implements SensorEventListener {
         sm = (SensorManager) requireContext().getSystemService(Context.SENSOR_SERVICE);
         Accelometer = sm.getDefaultSensor(Sensor.TYPE_ACCELEROMETER);
 
+
+        if (!Counting.isCounting) startCounting.setText("Start Counting");
+        else if (Counting.isCounting) startCounting.setText("Stop Counting");
+
         if (Accelometer == null) {
             displayer.setText("This device has no Accelometer counter");
+            startCounting.setEnabled(false);
+            toSteps.setEnabled(false);
         }
         else {
-            displayer.setText("Steps: 0");
+            displayer.setText("0");
         }
 
-        returnToStart.setOnClickListener(v -> {
+        toSteps.setOnClickListener(v -> {
             Bundle bundle = new Bundle();
+            if (Counting.isCounting) {
+                sm.unregisterListener(this);
+                Counting.isCounting = false;
+                startCounting.setText("Start Counting");
+            }
+
             bundle.putInt("STEP_COUNT", stepCount);
             ((MainActivity) getActivity()).nextFragment("Steps", "stepsFragment", bundle);
+            stepCount = 0;
+            updateUiState();
+        });
+
+        startCounting.setOnClickListener(v ->{
+            if (!Counting.isCounting) {
+                if (Accelometer != null) {
+                    stepCount = 0;
+                    displayer.setText("0");
+                    sm.registerListener(this, Accelometer, SensorManager.SENSOR_DELAY_GAME);
+                    Counting.isCounting = true;
+                    startCounting.setText("Stop Counting");
+                }
+            }
+            else if (Counting.isCounting) {
+                sm.unregisterListener(this);
+                Counting.isCounting = false;
+                startCounting.setText("Start Counting");
+            }
+            updateUiState();
         });
 
     }
@@ -68,15 +101,22 @@ public class startFragment extends Fragment implements SensorEventListener {
     @Override
     public void onResume() {
         super.onResume();
-        if (Accelometer != null) {
-            sm.registerListener(this, Accelometer, SensorManager.SENSOR_DELAY_GAME);
-        }
+        updateUiState();
     }
 
     @Override
     public void onPause() {
         super.onPause();
-        sm.unregisterListener(this);
+    }
+
+    private void updateUiState() {
+        if (Counting.isCounting) {
+            startCounting.setText("Stop Counting");
+        } else {
+            startCounting.setText("Start Counting");
+        }
+        // Also update the step display
+        displayer.setText(String.valueOf(stepCount));
     }
 
     @Override
@@ -86,6 +126,9 @@ public class startFragment extends Fragment implements SensorEventListener {
 
     @Override
     public void onSensorChanged(SensorEvent event) {
+
+        if(!Counting.isCounting) return;
+
         if(event.sensor.getType() == Sensor.TYPE_ACCELEROMETER) {
             // --- Step 1: Isolate Gravity from the Raw Data ---
             // This is a low-pass filter. It works like a moving average,
@@ -139,7 +182,7 @@ public class startFragment extends Fragment implements SensorEventListener {
                 if (currentTime - lastStepTime > STEP_DELAY_MS) {
                     lastStepTime = currentTime;
                     stepCount++;
-                    displayer.setText("Steps: " + stepCount);
+                    displayer.setText(String.valueOf(stepCount));
                 }
             }
         }

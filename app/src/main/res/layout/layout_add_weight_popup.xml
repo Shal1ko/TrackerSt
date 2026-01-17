@@ -2,23 +2,26 @@
 <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
+    android:background="@color/white"
     android:orientation="vertical">
 
-    <Button
+    <EditText
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:id="@+id/toWeightFromSteps"
-        android:text="Go to Weight analytics"/>
+        android:hint="Weight here"
+        android:inputType="numberDecimal"
+        android:id="@+id/weightAddEditText"/>
 
     <Button
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:id="@+id/returnToStartFromSteps"
-        android:text="Return"/>
+        android:id="@+id/weightAddButton"
+        android:text="Add Weight"/>
 
-    <ListView
+    <Button
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:id="@+id/stepsListView"/>
+        android:id="@+id/cancelAddWeight"
+        android:text="Cancel"/>
 
 </LinearLayout>

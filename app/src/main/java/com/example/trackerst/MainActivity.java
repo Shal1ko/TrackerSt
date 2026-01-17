@@ -28,6 +28,9 @@ public class MainActivity extends AppCompatActivity {
             case "stepsFragment":
                 fragment = new stepsFragment();
                 break;
+            case "weightFragment":
+                fragment = new weightFragment();
+                break;
             default:
                 break;
         }

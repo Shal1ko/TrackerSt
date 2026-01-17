@@ -4,21 +4,24 @@
     android:layout_height="match_parent"
     android:orientation="vertical">
 
-    <Button
+    <TextView
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:id="@+id/toWeightFromSteps"
-        android:text="Go to Weight analytics"/>
+        android:id="@+id/caloriesBurnt"/>
 
-    <Button
+    <TextView
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:id="@+id/returnToStartFromSteps"
-        android:text="Return"/>
+        android:id="@+id/weight"/>
 
-    <ListView
+    <TextView
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:id="@+id/stepsListView"/>
+        android:id="@+id/date"/>
+
+    <TextView
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:id="@+id/inputType"/>
 
 </LinearLayout>

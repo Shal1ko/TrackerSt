@@ -21,12 +21,14 @@ import java.util.Locale;
 
 public class stepsFragment extends Fragment {
 
-    Button returnToStart;
+    Button returnToStart, toWeight;
     ListView stepsListView;
 
     StepsAdapter adapter;
     ArrayList<Steps> stepsArrayList;
     stepsTable StepsTable;
+
+    int stepCount = 0;
 
     @Nullable
     @Override
@@ -39,17 +41,16 @@ public class stepsFragment extends Fragment {
         super.onViewCreated(view, savedInstanceState);
         returnToStart = view.findViewById(R.id.returnToStartFromSteps);
         stepsListView = view.findViewById(R.id.stepsListView);
+        toWeight = view.findViewById(R.id.toWeightFromSteps);
 
         StepsTable = new stepsTable(getContext(), "stepsTable", null, 1);
 
-        stepsArrayList = StepsTable.getData();
-        adapter = new StepsAdapter(getContext(), stepsArrayList);
-        stepsListView.setAdapter(adapter);
 
         Bundle arguments = getArguments();
 
+
         if (arguments != null && arguments.containsKey("STEP_COUNT")) {
-            int stepCount = arguments.getInt("STEP_COUNT");
+            stepCount = arguments.getInt("STEP_COUNT");
             SimpleDateFormat dateFormat = new SimpleDateFormat("dd-MM-yyyy", Locale.getDefault());
             String date = dateFormat.format(System.currentTimeMillis());
 
@@ -59,6 +60,10 @@ public class stepsFragment extends Fragment {
             values.put(stepsTable.COLUMN_3_DATE, date);
             StepsTable.insertData(values);
         }
+
+        stepsArrayList = StepsTable.getData();
+        adapter = new StepsAdapter(getContext(), stepsArrayList);
+        stepsListView.setAdapter(adapter);
 
 
 
@@ -85,6 +90,16 @@ public class stepsFragment extends Fragment {
             @Override
             public void onClick(View v) {
                 ((MainActivity) getActivity()).previousFragment();
+            }
+        });
+
+        toWeight.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                Bundle bundle = new Bundle();
+                bundle.putInt("STEP_COUNT", stepCount);
+
+                ((MainActivity) getActivity()).nextFragment("Weight", "weightFragment", bundle);
             }
         });
 

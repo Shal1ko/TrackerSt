@@ -36,7 +36,7 @@ public class weightAdapter extends BaseAdapter {
     @Override
     public View getView(int position, View convertView, ViewGroup parent) {
         if (convertView == null) {
-            inflater.inflate(R.layout.layout_weight, parent, false);
+            convertView = inflater.inflate(R.layout.layout_weight, parent, false);
         }
 
         TextView caloriesBurnt = convertView.findViewById(R.id.caloriesBurnt);

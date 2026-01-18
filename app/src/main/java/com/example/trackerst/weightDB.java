@@ -23,7 +23,7 @@ public class weightDB extends SQLiteOpenHelper {
 
     @Override
     public void onCreate(SQLiteDatabase db) {
-        db.execSQL("CREATE TABLE IF NOT EXISTS " + TABLE_NAME + "("+ COLUMN_1_ID + " INTEGER PRIMARY KEY AUTOINCREMENT, " + COLUMN_2_CALORIES_BURNT + " REAL, " + COLUMN_3_WEIGHT + " INTEGER, " + COLUMN_4_DATE + " DATE," + COLUMN_5_ESTIMATED_OR_INPUT + " TEXT)");
+        db.execSQL("CREATE TABLE IF NOT EXISTS " + TABLE_NAME + "("+ COLUMN_1_ID + " INTEGER PRIMARY KEY AUTOINCREMENT, " + COLUMN_2_CALORIES_BURNT + " REAL, " + COLUMN_3_WEIGHT + " REAL, " + COLUMN_4_DATE + " DATE," + COLUMN_5_ESTIMATED_OR_INPUT + " TEXT)");
     }
 
     @Override
@@ -53,7 +53,7 @@ public class weightDB extends SQLiteOpenHelper {
         while (cursor.moveToNext()) {
             int id = cursor.getInt(0);
             double caloriesBurnt = cursor.getDouble(1);
-            int weight = cursor.getInt(2);
+            double weight = cursor.getDouble(2);
             String date = cursor.getString(3);
             String inputType = cursor.getString(4);
 
@@ -64,5 +64,23 @@ public class weightDB extends SQLiteOpenHelper {
         db.close();
 
         return list;
+    }
+
+    public double getLastWeight() {
+        SQLiteDatabase db = getReadableDatabase();
+        String query = "SELECT * FROM " + TABLE_NAME + " ORDER BY " + COLUMN_1_ID + " DESC";
+
+        Cursor cursor = db.rawQuery(query, null);
+        if (cursor.moveToFirst()) {
+            double weight = cursor.getDouble(2);
+            cursor.close();
+            db.close();
+            return weight;
+        }
+
+        cursor.close();
+        db.close();
+
+        return -1;
     }
 }

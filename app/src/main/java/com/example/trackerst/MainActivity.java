@@ -22,13 +22,13 @@ public class MainActivity extends AppCompatActivity {
         Fragment fragment = null;
 
         switch (fragmentName) {
-            case "startFragment":
+            case Fragments.START:
                 fragment = new startFragment();
                 break;
-            case "stepsFragment":
+            case Fragments.STEPS:
                 fragment = new stepsFragment();
                 break;
-            case "weightFragment":
+            case Fragments.WEIGHT:
                 fragment = new weightFragment();
                 break;
             default:

@@ -51,14 +51,14 @@ public class stepsFragment extends Fragment {
 
         if (arguments != null && arguments.containsKey("STEP_COUNT")) {
             stepCount = arguments.getInt("STEP_COUNT");
-            SimpleDateFormat dateFormat = new SimpleDateFormat("dd-MM-yyyy", Locale.getDefault());
-            String date = dateFormat.format(System.currentTimeMillis());
+            String date = DateFormat.dateFormat.format(System.currentTimeMillis());
 
 
             ContentValues values = new ContentValues();
             values.put(stepsTable.COLUMN_2_STEPS, stepCount);
             values.put(stepsTable.COLUMN_3_DATE, date);
             StepsTable.insertData(values);
+            arguments.remove("STEP_COUNT");
         }
 
         stepsArrayList = StepsTable.getData();
@@ -96,10 +96,15 @@ public class stepsFragment extends Fragment {
         toWeight.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                Bundle bundle = new Bundle();
-                bundle.putInt("STEP_COUNT", stepCount);
+                if (stepCount > 0) {
+                    Bundle bundle = new Bundle();
+                    bundle.putInt("STEP_COUNT", stepCount);
 
-                ((MainActivity) getActivity()).nextFragment("Weight", "weightFragment", bundle);
+                    ((MainActivity) getActivity()).nextFragment("Weight", Fragments.WEIGHT, bundle);
+                }
+                else {
+                    ((MainActivity) getActivity()).nextFragment("Weight", Fragments.WEIGHT);
+                }
             }
         });
 

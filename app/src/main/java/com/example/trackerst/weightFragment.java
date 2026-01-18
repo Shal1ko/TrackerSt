@@ -13,21 +13,27 @@ import android.view.Window;
 import android.widget.Button;
 import android.widget.EditText;
 import android.widget.ListView;
+import android.widget.Toast;
 
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import androidx.fragment.app.Fragment;
 
+import java.text.SimpleDateFormat;
 import java.util.ArrayList;
+import java.util.Locale;
 
 public class weightFragment extends Fragment {
-    Button addWeight, backToPreviousFragmentFromWeight;
+    Button addWeight, backToPreviousFragmentFromWeight, changeHeight;
     ListView weightListView;
     weightDB db;
+    heightDB hdb;
     ArrayList<Weight> list;
     weightAdapter adapter;
 
     int stepCount = 0;
+    double height;
+    double lastWeight;
 
 
     @Nullable
@@ -40,19 +46,57 @@ public class weightFragment extends Fragment {
     public void onViewCreated(@NonNull View view, @Nullable Bundle savedInstanceState) {
         super.onViewCreated(view, savedInstanceState);
 
+        if(getContext() == null) return;
+
         addWeight = view.findViewById(R.id.addWeight);
         backToPreviousFragmentFromWeight = view.findViewById(R.id.backToPreviousFragmentFromWeight);
         weightListView = view.findViewById(R.id.weightListView);
+        changeHeight = view.findViewById(R.id.replaceHeight);
+
         db = new weightDB(getContext(), "weightDB", null, 1);
+        hdb = new heightDB(getContext(), "heightDB", null, 1);
 
         list = db.getData();
+        height = hdb.getHeight();
         adapter = new weightAdapter(getContext(), list);
         weightListView.setAdapter(adapter);
+
+
+
+        Bundle argumments = getArguments();
+
+        if (argumments != null) {
+            stepCount = argumments.getInt("STEP_COUNT");
+
+            double distance = (stepCount * (height * 0.414))/100000;
+            lastWeight = db.getLastWeight();
+
+
+            double caloriesBurnt = distance * lastWeight * 0.65;
+            double newWeight = lastWeight - (caloriesBurnt/7700);
+            String date = DateFormat.dateFormat.format(System.currentTimeMillis());
+
+            ContentValues values = new ContentValues();
+            values.put(weightDB.COLUMN_2_CALORIES_BURNT, caloriesBurnt);
+            values.put(weightDB.COLUMN_3_WEIGHT, newWeight);
+            values.put(weightDB.COLUMN_4_DATE, date);
+            values.put(weightDB.COLUMN_5_ESTIMATED_OR_INPUT, "Estimated");
+
+            db.insertData(values);
+            list.clear();
+            list.addAll(db.getData());
+            adapter.notifyDataSetChanged();
+            argumments.remove("STEP_COUNT");
+        }
+
 
 
         backToPreviousFragmentFromWeight.setOnClickListener(v -> {
             ((MainActivity) getActivity()).previousFragment();
         });
+
+
+
 
         addWeight.setOnClickListener(v -> {
             Dialog dialog = new Dialog(getContext());
@@ -66,8 +110,10 @@ public class weightFragment extends Fragment {
 
             addWeightButton.setOnClickListener(a -> {
                 ContentValues values = new ContentValues();
-                values.put(weightDB.COLUMN_3_WEIGHT, Integer.parseInt(weightAddEditText.getText().toString()));
-                values.put(weightDB.COLUMN_4_DATE, System.currentTimeMillis());
+                String date = DateFormat.dateFormat.format(System.currentTimeMillis());
+
+                values.put(weightDB.COLUMN_3_WEIGHT, Double.parseDouble(weightAddEditText.getText().toString()));
+                values.put(weightDB.COLUMN_4_DATE, date);
                 values.put(weightDB.COLUMN_5_ESTIMATED_OR_INPUT, "Input");
                 db.insertData(values);
                 list.clear();
@@ -76,6 +122,7 @@ public class weightFragment extends Fragment {
                 dialog.cancel();
             });
 
+
             cancelAddWeight.setOnClickListener(a -> {
                 dialog.cancel();
             });
@@ -83,6 +130,43 @@ public class weightFragment extends Fragment {
             dialog.show();
 
         });
+
+
+
+
+        changeHeight.setOnClickListener( v1 -> {
+            Dialog dialog1 = new Dialog(getContext());
+            dialog1.requestWindowFeature(Window.FEATURE_NO_TITLE);
+            dialog1.setContentView(R.layout.input_height);
+            dialog1.getWindow().setBackgroundDrawable(new ColorDrawable(Color.TRANSPARENT));
+
+            EditText heightInputEditText = dialog1.findViewById(R.id.heightInputEditText);
+            Button heightInputButton = dialog1.findViewById(R.id.heightInputButton);
+            Button cancelHeightInput = dialog1.findViewById(R.id.cancelHeightInput);
+            cancelHeightInput.setEnabled(true);
+
+
+            heightInputButton.setOnClickListener(new View.OnClickListener() {
+                @Override
+                public void onClick(View v) {
+                    if (!heightInputEditText.getText().toString().isEmpty()) {
+                        double height = Double.parseDouble(heightInputEditText.getText().toString());
+                        hdb.replaceHeight(height);
+                        dialog1.dismiss();
+                    } else {
+                        Toast.makeText(getContext(), "Please enter a valid height", Toast.LENGTH_SHORT).show();
+                    }
+                }
+            });
+
+            cancelHeightInput.setOnClickListener(v2 -> {
+                dialog1.dismiss();
+            });
+
+
+            dialog1.show();
+        });
+
 
 
     }

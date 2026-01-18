@@ -9,7 +9,7 @@ public class Weight {
     private String date;
     private String inputType;
 
-    public Weight(int id, @Nullable Double caloriesBurnt, int weight, String date, String inputType) {
+    public Weight(int id, @Nullable Double caloriesBurnt, double weight, String date, String inputType) {
         this.id = id;
         this.caloriesBurnt = caloriesBurnt;
         this.weight = weight;

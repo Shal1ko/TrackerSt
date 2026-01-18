@@ -1,6 +1,10 @@
 package com.example.trackerst;
 
+import android.app.Dialog;
+import android.content.ContentValues;
 import android.content.Context;
+import android.graphics.Color;
+import android.graphics.drawable.ColorDrawable;
 import android.hardware.Sensor;
 import android.hardware.SensorEvent;
 import android.hardware.SensorEventListener;
@@ -9,8 +13,11 @@ import android.os.Bundle;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.view.Window;
 import android.widget.Button;
+import android.widget.EditText;
 import android.widget.TextView;
+import android.widget.Toast;
 
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
@@ -21,6 +28,8 @@ public class startFragment extends Fragment implements SensorEventListener {
     Button toSteps, startCounting;
     SensorManager sm;
     Sensor Accelometer;
+    heightDB hdb;
+    weightDB wdb;
 
     static int stepCount = 0;
     long lastStepTime = 0;
@@ -52,6 +61,83 @@ public class startFragment extends Fragment implements SensorEventListener {
         Accelometer = sm.getDefaultSensor(Sensor.TYPE_ACCELEROMETER);
 
 
+
+
+        hdb = new heightDB(getContext(), "heightDB", null, 1);
+        double heightCheck = hdb.getHeight();
+        if (heightCheck == -1) {
+            Dialog dialog = new Dialog(getContext());
+            dialog.requestWindowFeature(Window.FEATURE_NO_TITLE);
+            dialog.setContentView(R.layout.input_height);
+            dialog.getWindow().setBackgroundDrawable(new ColorDrawable(Color.TRANSPARENT));
+
+            EditText heightInputEditText = dialog.findViewById(R.id.heightInputEditText);
+            Button heightInputButton = dialog.findViewById(R.id.heightInputButton);
+
+
+            heightInputButton.setOnClickListener(new View.OnClickListener() {
+                @Override
+                public void onClick(View v) {
+                    if (!heightInputEditText.getText().toString().isEmpty()) {
+                        try {
+                            double height = Double.parseDouble(heightInputEditText.getText().toString());
+                            hdb.replaceHeight(height);
+                            dialog.dismiss();
+
+                            wdb = new weightDB(getContext(), "weightDB", null, 1);
+                            double lastWeight = wdb.getLastWeight();
+                            if (lastWeight == -1) {
+                                Dialog dialog1 = new Dialog(getContext());
+                                dialog1.requestWindowFeature(Window.FEATURE_NO_TITLE);
+                                dialog1.getWindow().setBackgroundDrawable(new ColorDrawable(Color.TRANSPARENT));
+                                dialog1.setContentView(R.layout.layout_add_weight_popup);
+
+                                Button addWeightButton = dialog1.findViewById(R.id.weightAddButton);
+                                Button cancelAddWeight = dialog1.findViewById(R.id.cancelAddWeight);
+                                EditText weightAddEditText = dialog1.findViewById(R.id.weightAddEditText);
+                                cancelAddWeight.setEnabled(false);
+
+                                addWeightButton.setOnClickListener(a -> {
+                                    if (!weightAddEditText.getText().toString().isEmpty()) {
+                                        try {
+                                            String date = DateFormat.dateFormat.format(System.currentTimeMillis());
+                                            ContentValues values = new ContentValues();
+                                            values.put(weightDB.COLUMN_3_WEIGHT, Double.parseDouble(weightAddEditText.getText().toString()));
+                                            values.put(weightDB.COLUMN_4_DATE, date);
+                                            values.put(weightDB.COLUMN_5_ESTIMATED_OR_INPUT, "Input");
+                                            wdb.insertData(values);
+                                            dialog1.cancel();
+                                        }
+                                        catch (NumberFormatException e) {
+                                            Toast.makeText(getContext(), "Please enter a valid weight", Toast.LENGTH_SHORT).show();
+                                        }
+                                    }
+                                    else {
+                                        Toast.makeText(getContext(), "Please enter a valid weight", Toast.LENGTH_SHORT).show();
+                                    }
+                                });
+
+                                dialog1.show();
+                            }
+                        }
+
+                        catch (NumberFormatException e) {
+                            Toast.makeText(getContext(), "Please enter a valid height", Toast.LENGTH_SHORT).show();
+                        }
+                    } else {
+                        Toast.makeText(getContext(), "Please enter a valid height", Toast.LENGTH_SHORT).show();
+                    }
+                }
+            });
+
+
+            dialog.show();
+        }
+
+
+
+
+
         if (!Counting.isCounting) startCounting.setText("Start Counting");
         else if (Counting.isCounting) startCounting.setText("Stop Counting");
 
@@ -73,7 +159,7 @@ public class startFragment extends Fragment implements SensorEventListener {
             }
 
             bundle.putInt("STEP_COUNT", stepCount);
-            ((MainActivity) getActivity()).nextFragment("Steps", "stepsFragment", bundle);
+            ((MainActivity) getActivity()).nextFragment("Steps", Fragments.STEPS, bundle);
             stepCount = 0;
             updateUiState();
         });

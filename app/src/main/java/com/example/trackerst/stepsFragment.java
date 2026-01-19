@@ -27,7 +27,9 @@ public class stepsFragment extends Fragment {
     StepsAdapter adapter;
     ArrayList<Steps> stepsArrayList;
     stepsTable StepsTable;
-
+    weightDB wdb;
+    heightDB hdb;
+    double height, lastWeight;
     int stepCount = 0;
 
     @Nullable
@@ -60,6 +62,35 @@ public class stepsFragment extends Fragment {
             StepsTable.insertData(values);
             arguments.remove("STEP_COUNT");
         }
+
+        if (stepCount != 0) {
+            wdb = new weightDB(getContext(), "weightDB", null, 1);
+            hdb = new heightDB(getContext(), "heightDB", null, 1);
+
+            height = hdb.getHeight();
+
+            double distance = (stepCount * (height * 0.414))/100000;
+            lastWeight = wdb.getLastWeight();
+
+
+            double caloriesBurnt = distance * lastWeight * 0.65;
+            double newWeight = lastWeight - (caloriesBurnt/7700);
+            String date = DateFormat.dateFormat.format(System.currentTimeMillis());
+
+            ContentValues values = new ContentValues();
+            values.put(weightDB.COLUMN_2_CALORIES_BURNT, caloriesBurnt);
+            values.put(weightDB.COLUMN_3_WEIGHT, newWeight);
+            values.put(weightDB.COLUMN_4_DATE, date);
+            values.put(weightDB.COLUMN_5_ESTIMATED_OR_INPUT, "Estimated");
+
+            wdb.insertData(values);
+            stepCount = 0;
+        }
+
+
+
+
+
 
         stepsArrayList = StepsTable.getData();
         adapter = new StepsAdapter(getContext(), stepsArrayList);
@@ -96,15 +127,7 @@ public class stepsFragment extends Fragment {
         toWeight.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                if (stepCount > 0) {
-                    Bundle bundle = new Bundle();
-                    bundle.putInt("STEP_COUNT", stepCount);
-
-                    ((MainActivity) getActivity()).nextFragment("Weight", Fragments.WEIGHT, bundle);
-                }
-                else {
                     ((MainActivity) getActivity()).nextFragment("Weight", Fragments.WEIGHT);
-                }
             }
         });
 

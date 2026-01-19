@@ -31,9 +31,7 @@ public class weightFragment extends Fragment {
     ArrayList<Weight> list;
     weightAdapter adapter;
 
-    int stepCount = 0;
     double height;
-    double lastWeight;
 
 
     @Nullable
@@ -60,34 +58,6 @@ public class weightFragment extends Fragment {
         height = hdb.getHeight();
         adapter = new weightAdapter(getContext(), list);
         weightListView.setAdapter(adapter);
-
-
-
-        Bundle argumments = getArguments();
-
-        if (argumments != null) {
-            stepCount = argumments.getInt("STEP_COUNT");
-
-            double distance = (stepCount * (height * 0.414))/100000;
-            lastWeight = db.getLastWeight();
-
-
-            double caloriesBurnt = distance * lastWeight * 0.65;
-            double newWeight = lastWeight - (caloriesBurnt/7700);
-            String date = DateFormat.dateFormat.format(System.currentTimeMillis());
-
-            ContentValues values = new ContentValues();
-            values.put(weightDB.COLUMN_2_CALORIES_BURNT, caloriesBurnt);
-            values.put(weightDB.COLUMN_3_WEIGHT, newWeight);
-            values.put(weightDB.COLUMN_4_DATE, date);
-            values.put(weightDB.COLUMN_5_ESTIMATED_OR_INPUT, "Estimated");
-
-            db.insertData(values);
-            list.clear();
-            list.addAll(db.getData());
-            adapter.notifyDataSetChanged();
-            argumments.remove("STEP_COUNT");
-        }
 
 
 

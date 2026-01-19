@@ -34,13 +34,13 @@ public class startFragment extends Fragment implements SensorEventListener {
     static int stepCount = 0;
     long lastStepTime = 0;
     static final int STEP_DELAY_MS = 500;
-    static final float STEP_THRESHOLD = 9.8f * 1.5f;
-    float[] lastAccel = new float[3];
     float accelCurrent,accelLast;
 
     float[] gravity = new float[3];
     float[] linear_acceleration = new float[3];
     float smoothedAcceleration = 0f;
+    // A better threshold, now that gravity is removed. This is tunable.
+    final float STEP_DETECTION_THRESHOLD = 3.45f;
 
     @Nullable
     @Override
@@ -230,9 +230,9 @@ public class startFragment extends Fragment implements SensorEventListener {
 
             // Remove the gravity contribution from the raw sensor data.
             // What's left is the actual acceleration of the device.
-            linear_acceleration[0] = event.values[0] - gravity[0];
-            linear_acceleration[1] = event.values[1] - gravity[1];
-            linear_acceleration[2] = event.values[2] - gravity[2];
+            linear_acceleration[0] = event.values[0] - gravity[0]; // x
+            linear_acceleration[1] = event.values[1] - gravity[1]; // y
+            linear_acceleration[2] = event.values[2] - gravity[2]; // z
 
 
             // --- Step 2: Calculate Magnitude on the Clean Data ---
@@ -249,7 +249,7 @@ public class startFragment extends Fragment implements SensorEventListener {
             // The magnitude can still be a bit spiky. We apply another
             // lightweight smoothing filter to it to make finding the "peak" of the step
             // more reliable.
-            smoothedAcceleration = smoothedAcceleration * 0.7f + magnitude * 0.3f;
+            smoothedAcceleration = smoothedAcceleration * 0.8f + magnitude * 0.2f;
 
 
             // --- Step 4: Detect the Step Peak ---
@@ -257,8 +257,6 @@ public class startFragment extends Fragment implements SensorEventListener {
             // the smoothedAcceleration value crosses a threshold. This is much
             // more reliable.
 
-            // A better threshold, now that gravity is removed. This is tunable.
-            final float STEP_DETECTION_THRESHOLD = 0.8f;
 
             long currentTime = System.currentTimeMillis();
 
